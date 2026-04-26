@@ -1,5 +1,4 @@
 -- Denne fil køres automatisk, når MySQL-containeren starter første gang
-
 USE flask_demo;
 
 CREATE TABLE IF NOT EXISTS devices (
@@ -9,6 +8,17 @@ CREATE TABLE IF NOT EXISTS devices (
     status VARCHAR(50) NOT NULL,
     customer_name VARCHAR(255) NOT NULL,
     last_seen DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sensor_events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    device_id VARCHAR(100) NOT NULL,
+    sensor_type VARCHAR(100) NOT NULL,
+    value FLOAT NOT NULL,
+    unit VARCHAR(50),
+    status VARCHAR(50) NOT NULL,
+    message VARCHAR(255),
+    created_at DATETIME DEFAULT NOW()
 );
 
 INSERT INTO devices (name, location, status, customer_name, last_seen)
