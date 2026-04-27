@@ -160,11 +160,52 @@ def get_sensor_events():
 def get_alarms():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM sensor_events WHERE status = 'ALARM' ORDER BY created_at DESC")
+    cursor.execute("SELECT * FROM alarms WHERE resolved = FALSE ORDER BY created_at DESC")
     rows = cursor.fetchall()
     cursor.close()
     conn.close()
     return jsonify(rows)
+
+@app.route("/api/alarms", methods=["POST"])
+def create_alarm():
+    data = request.get_json()
+    required_fields = ["device_id", "alarm_type", "severity", "message"]
+    if not data or any(f not in data for f in required_fields):
+        return jsonify({"error": f"Missing one of {required_fields}"}), 400
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO alarms (device_id, alarm_type, severity, message) VALUES (%s, %s, %s, %s)",
+        (data["device_id"], data["alarm_type"], data["severity"], data["message"])
+    )
+    conn.commit()
+    new_id = cursor.lastrowid
+    cursor.close()
+    conn.close()
+    return jsonify({
+        "id": new_id,
+        "device_id": data["device_id"],
+        "alarm_type": data["alarm_type"],
+        "severity": data["severity"],
+        "message": data["message"],
+        "resolved": False
+    }), 201
+
+@app.route("/api/alarms/<int:alarm_id>/resolve", methods=["PUT"])
+def resolve_alarm(alarm_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM alarms WHERE id = %s", (alarm_id,))
+    row = cursor.fetchone()
+    if not row:
+        cursor.close()
+        conn.close()
+        return jsonify({"error": "Alarm not found"}), 404
+    cursor.execute("UPDATE alarms SET resolved = TRUE WHERE id = %s", (alarm_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({"message": f"Alarm {alarm_id} resolved"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

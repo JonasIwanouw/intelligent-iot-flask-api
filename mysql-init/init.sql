@@ -21,6 +21,16 @@ CREATE TABLE IF NOT EXISTS sensor_events (
     created_at DATETIME DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS alarms (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    device_id VARCHAR(100) NOT NULL,
+    alarm_type VARCHAR(100) NOT NULL,
+    severity VARCHAR(50) NOT NULL,
+    message VARCHAR(255),
+    resolved BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT NOW()
+);
+
 INSERT INTO devices (name, location, status, customer_name, last_seen)
 VALUES
 ('Sensor-ALB-001', 'Aalborg Wind Farm 1', 'online', 'Vestas', NOW()),
