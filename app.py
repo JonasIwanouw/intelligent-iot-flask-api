@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+password = "hemmeligtkodeord123"  # TEST - SLET EFTER TEST
+
 app = Flask(__name__)
 
 def add(a, b):
