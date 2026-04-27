@@ -69,4 +69,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: tags: ghcr.io/jonasiwanouw/intelligent-iot-flask-api:latest
+          tags: ghcr.io/jonasiwan0uw/intelligent-iot-flask-api:latest
